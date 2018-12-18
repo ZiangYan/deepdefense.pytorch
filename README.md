@@ -11,7 +11,7 @@ Deep Defense is recipe to improve the robustness of DNNs to adversarial perturba
 ## Datasets and Reference Models
 For fair comparison with DeepFool, we follow it to use [matconvnet](https://github.com/vlfeat/matconvnet/releases/tag/v1.0-beta24) to pre-process data and train reference models for MNIST and CIFAR-10.
 
-Please download processed datasets and reference models (including MNIST and CIFAR-10) at [download link](https://drive.google.com/open?id=15xoZ-LUbc9GZpTlxmCJmvL_DR2qYEu2J).
+Please download processed datasets and reference models (including MNIST and CIFAR-10) at [Google Drive](https://drive.google.com/open?id=15xoZ-LUbc9GZpTlxmCJmvL_DR2qYEu2J) or [Baidu Pan](https://pan.baidu.com/s/1-TSXR8kVcat7IXtuE74nJg).
 
 ## Usage
 To train a Deep Defense LeNet model using default parameters on MNIST:
