@@ -114,12 +114,12 @@ class InverseConvNet(nn.Module):
         self.transposeconv1 = nn.ConvTranspose2d(32, 3, 5, padding=2, bias=False)
 
         # inverse pool2 (average pooling)
-        self.w2 = torch.zeros(32, 32, 2, 2).cuda()
+        self.w2 = torch.zeros(32, 32, 2, 2)
         for i in range(32):
             self.w2[i, i, :, :] = 0.25
 
         # inverse pool3 (average pooling)
-        self.w3 = torch.zeros(64, 64, 2, 2).cuda()
+        self.w3 = torch.zeros(64, 64, 2, 2)
         for i in range(64):
             self.w3[i, i, :, :] = 0.25
 
@@ -174,12 +174,12 @@ class InverseConvNet(nn.Module):
         batch_size = input_image.size()[0]
         image_shape = input_image.size()[1:]
 
-        output_var = net(input_image.cuda())
+        output_var = net(input_image)
 
         dzdy = np.zeros((idx.numel(), output_var.size()[1]), dtype=np.float32)
         dzdy[np.arange(idx.numel()), idx.view(idx.numel()).cpu().numpy()] = 1.
 
-        inverse_input_var = torch.from_numpy(dzdy).cuda()
+        inverse_input_var = torch.from_numpy(dzdy).to(input_image.device)
         inverse_input_var.requires_grad = True
         inverse_output_var = self.forward(
             inverse_input_var,
@@ -334,7 +334,7 @@ class InverseNIN(nn.Module):
         self.transposeconv1 = nn.ConvTranspose2d(192, 3, 5, padding=2, bias=False)
 
         # inverse pool2 (average pooling)
-        self.w = torch.zeros(192, 192, 2, 2).cuda()
+        self.w = torch.zeros(192, 192, 2, 2)
         for i in range(192):
             self.w[i, i, :, :] = 1. / 4
 
@@ -392,7 +392,7 @@ class InverseNIN(nn.Module):
         dzdy = np.zeros((idx.numel(), output_var.size()[1]), dtype=np.float32)
         dzdy[np.arange(idx.numel()), idx.view(idx.numel()).cpu().numpy()] = 1.
 
-        inverse_input_var = torch.from_numpy(dzdy).cuda()
+        inverse_input_var = torch.from_numpy(dzdy).to(input_image.device)
         inverse_input_var.requires_grad = True
         inverse_output_var = self.forward(
             inverse_input_var,

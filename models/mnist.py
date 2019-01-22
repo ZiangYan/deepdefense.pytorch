@@ -80,9 +80,9 @@ class LeNet(nn.Module):
         for k in ['conv1', 'conv2', 'fc1', 'fc2']:
             t = self.__getattr__(k)
             assert t.weight.data.size() == mcn_weights['%s.weights' % k].shape
-            t.weight.data[:] = torch.from_numpy(mcn_weights['%s.weights' % k]).cuda()
+            t.weight.data[:] = torch.from_numpy(mcn_weights['%s.weights' % k])
             assert t.bias.data.size() == mcn_weights['%s.bias' % k].shape
-            t.bias.data[:] = torch.from_numpy(mcn_weights['%s.bias' % k]).cuda()
+            t.bias.data[:] = torch.from_numpy(mcn_weights['%s.bias' % k])
 
     @staticmethod
     def num_flat_features(x):
@@ -133,12 +133,12 @@ class InverseLeNet(nn.Module):
         image_shape = input_image.size()[1:]
 
         # use inversenet to calculate gradient
-        output_var = net(input_image.cuda())
+        output_var = net(input_image)
 
         dzdy = np.zeros((idx.numel(), output_var.size()[1]), dtype=np.float32)
         dzdy[np.arange(idx.numel()), idx.view(idx.numel()).cpu().numpy()] = 1.
 
-        inverse_input_var = torch.from_numpy(dzdy).cuda()
+        inverse_input_var = torch.from_numpy(dzdy).to(input_image.device)
         inverse_input_var.requires_grad = True
         inverse_output_var = self.forward(
             inverse_input_var,
@@ -186,9 +186,9 @@ class MLP(nn.Module):
         for k in ['fc1', 'fc2', 'fc3']:
             t = self.__getattr__(k)
             assert t.weight.data.size() == mcn_weights['%s.weights' % k].shape
-            t.weight.data[:] = torch.from_numpy(mcn_weights['%s.weights' % k]).cuda()
+            t.weight.data[:] = torch.from_numpy(mcn_weights['%s.weights' % k])
             assert t.bias.data.size() == mcn_weights['%s.bias' % k].shape
-            t.bias.data[:] = torch.from_numpy(mcn_weights['%s.bias' % k]).cuda()
+            t.bias.data[:] = torch.from_numpy(mcn_weights['%s.bias' % k])
 
 
 class InverseMLP(nn.Module):
@@ -219,12 +219,12 @@ class InverseMLP(nn.Module):
         batch_size = input_image.size()[0]
         image_shape = input_image.size()[1:]
 
-        output_var = net(input_image.cuda())
+        output_var = net(input_image)
 
         dzdy = np.zeros((idx.numel(), output_var.size()[1]), dtype=np.float32)
-        dzdy[np.arange(idx.numel()), idx.view(idx.numel()).cpu().numpy()] = 1.
+        dzdy[np.arange(idx.numel()), idx.contiguous().view(idx.numel()).cpu().numpy()] = 1.
 
-        inverse_input_var = torch.from_numpy(dzdy).cuda()
+        inverse_input_var = torch.from_numpy(dzdy).to(input_image.device)
         inverse_input_var.requires_grad = True
         inverse_output_var = self.forward(
             inverse_input_var,
