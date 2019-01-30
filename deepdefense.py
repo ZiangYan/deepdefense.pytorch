@@ -14,7 +14,7 @@ import torch.nn.functional as F
 
 from datasets.mnist import MNISTDataset
 from datasets.cifar10 import CIFAR10Dataset
-from models.mnist import LeNet, InverseLeNet, MLP, InverseMLP
+from models.mnist import LeNet, InverseLeNet, MLP, InverseMLP, MLPBN, InverseMLPBN, BNTranspose
 from models.cifar10 import ConvNet, InverseConvNet, NIN, InverseNIN
 
 
@@ -70,7 +70,7 @@ class DeepFool(nn.Module):
 
         # initialize net
         if args.dataset == 'mnist':
-            assert args.arch in ['MLP', 'LeNet']
+            assert args.arch in ['MLP', 'MLPBN', 'LeNet']
         elif args.dataset == 'cifar10':
             assert args.arch in ['ConvNet', 'NIN']
         else:
@@ -344,12 +344,14 @@ def test(model, phases='test'):
 
 def train(model):
     num_epoch = args.epochs
-    optimizer = optim.SGD([
-        {'params': [p[1] for p in list(model.named_parameters())[1::2]], 'lr': args.lr, 'weight_decay': 0,
-         'momentum': 0.9},  # bias
-        {'params': [p[1] for p in list(model.named_parameters())[::2]], 'lr': args.lr, 'weight_decay': args.decay,
-         'momentum': 0.9}  # weight
-    ])
+    def trainable(name):
+        if 'bn' in name:
+            return False
+        return True
+    trainable_parameters = list(p[1] for p in model.named_parameters() if trainable(p[0]))
+    optimizer = optim.SGD(trainable_parameters, lr=args.lr, weight_decay=args.decay, momentum=0.9)
+    log.info('Train {} params among all {} params'.format(len(trainable_parameters), len(list(model.parameters()))))
+    log.info('Trainable param list: {}'.format(list(p[0] for p in model.named_parameters() if trainable(p[0]))))
     num_image = len(train_loader.dataset)
     log.info('Found %d images' % num_image)
 
@@ -369,8 +371,11 @@ def train(model):
 
         perm = np.random.permutation(num_image)
         train_loader.dataset.shuffle(perm)
+        model.train()
+        for m in model.modules():
+            if isinstance(m, (nn.BatchNorm1d, nn.BatchNorm2d, nn.BatchNorm3d, BNTranspose)):
+                m.eval()
         for index, (image, label) in enumerate(train_loader):
-            model.train()
             batch_in_train_batch = index % (args.train_batch // args.batch)
             if batch_in_train_batch == 0:
                 noise_norm = np.zeros(args.train_batch)
@@ -472,6 +477,7 @@ def train(model):
             if batch_in_train_batch == (args.train_batch / args.batch - 1):
                 optimizer.step()
                 optimizer.zero_grad()
+                model.zero_grad()
 
                 log.info('Processing %d - %d / %d' % ((index + 1) * args.batch - args.train_batch,
                                                       (index + 1) * args.batch, num_image))

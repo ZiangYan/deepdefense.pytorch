@@ -13,4 +13,4 @@ LOG=${DIR}"/train.log"
 exec &> >(tee -a "$LOG")
 echo Logging output to "$LOG"
 
-time python3 deepdefense.py --exp_dir $DIR $@
+time python3 deepdefense.py --exp-dir $DIR $@
