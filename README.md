@@ -13,7 +13,7 @@ For fair comparison with DeepFool, we follow it to use [matconvnet](https://gith
 
 Please download processed datasets and reference models (including MNIST and CIFAR-10) at [Google Drive](https://drive.google.com/open?id=15xoZ-LUbc9GZpTlxmCJmvL_DR2qYEu2J) or [Baidu Pan](https://pan.baidu.com/s/1-TSXR8kVcat7IXtuE74nJg).
 
-For the MLP with batch normalization example [issue 2](https://github.com/ZiangYan/deepdefense.pytorch/issues/2), please download the reference model at [Google Drive](https://drive.google.com/open?id=1Vy4xWeXhOX_QluYH33SHVE3q_KDOOBeF) or [Baidu Pan](https://pan.baidu.com/s/1cIgGX6b-1AQ4ybSyX2xDew).
+For the MLP with batch normalization example [(issue 2)](https://github.com/ZiangYan/deepdefense.pytorch/issues/2), please download the reference model at [Google Drive](https://drive.google.com/open?id=1Vy4xWeXhOX_QluYH33SHVE3q_KDOOBeF) or [Baidu Pan](https://pan.baidu.com/s/1cIgGX6b-1AQ4ybSyX2xDew).
 
 ## Usage
 To train a Deep Defense LeNet model using default parameters on MNIST:
